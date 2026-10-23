@@ -1,8 +1,8 @@
-# 💪 GYM Manager – Hệ Thống Quản Lý Phòng Tập Gym
+# GYM Manager – Hệ Thống Quản Lý Phòng Tập Gym
 
-> Đồ án môn học Công nghệ Thông tin – Xây dựng hệ thống quản lý phòng tập gym với Flask (Python).
+> Đồ án môn học Công nghệ Phần Mềm – Xây dựng hệ thống quản lý phòng tập gym.
 
-## 📋 Mô Tả
+## Mô Tả
 
 Hệ thống quản lý phòng tập gym hỗ trợ 5 vai trò người dùng, bao gồm các chức năng:
 
@@ -12,7 +12,7 @@ Hệ thống quản lý phòng tập gym hỗ trợ 5 vai trò người dùng, b
 - **Thu ngân (CASHIER):** Quản lý hóa đơn, xác nhận thanh toán.
 - **Hội viên (MEMBER):** Đăng ký trực tuyến, xem lịch tập và hóa đơn cá nhân.
 
-## ✨ Tính Năng Chính
+## Tính Năng Chính
 
 | Chức năng | Mô tả |
 |-----------|--------|
@@ -24,7 +24,7 @@ Hệ thống quản lý phòng tập gym hỗ trợ 5 vai trò người dùng, b
 | Phân quyền | 5 vai trò, kiểm tra quyền ở cả route và service |
 | Email bất đồng bộ | Gửi qua hàng đợi Redis, có retry và ghi log |
 
-## 🏗️ Kiến Trúc
+## Kiến Trúc
 
 ```
 Modular Monolith
@@ -50,7 +50,7 @@ Route (Blueprint) → Service (Business Logic) → Repository (Data Access) → 
 | Email | Flask-Mail (SMTP) |
 | Triển khai | Docker Compose |
 
-## 📁 Cấu Trúc Thư Mục
+## Cấu Trúc Thư Mục
 
 ```
 gym-management/
@@ -80,7 +80,7 @@ gym-management/
 └── tests/                      # Unit tests
 ```
 
-## 🗄️ Mô Hình Dữ Liệu
+## Mô Hình Dữ Liệu
 
 ```
 users ──────────┐
@@ -155,13 +155,7 @@ python -m seeds.seed
 python run.py
 ```
 
-## 🧪 Chạy Tests
-
-```bash
-pytest tests/ -v
-```
-
-## 📏 Quy Tắc Nghiệp Vụ
+## Quy Tắc Nghiệp Vụ
 
 | Mã | Quy tắc |
 |----|---------|
@@ -170,11 +164,3 @@ pytest tests/ -v
 | BR3 | Số ngày tập trong kế hoạch ≤ `max_days_per_week` (đọc từ bảng settings) |
 | BR4 | Mỗi hội viên có tối đa 1 HLV cá nhân |
 | BR5 | Gửi email thất bại không hủy đăng ký. Gửi bất đồng bộ, ghi log để retry |
-
-## 👨‍💻 Tác Giả
-
-- **Thanh Tùng** – Sinh viên CNTT
-
-## 📄 License
-
-Dự án phục vụ mục đích học tập.
