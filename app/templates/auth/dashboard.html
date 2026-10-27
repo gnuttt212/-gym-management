@@ -1,7 +1,228 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
+
 {% block content %}
-<h2>Dashboard</h2>
-<p class="text-muted">Chào mừng bạn đến với hệ thống quản lý phòng tập gym.</p>
-<!-- Dashboard content implemented in Phase 3 -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+    <span class="badge bg-primary fs-6">{{ session.get('role', '') }}</span>
+</div>
+
+{% if role == 'ADMIN' %}
+<!-- ══════════════ ADMIN DASHBOARD ══════════════ -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card text-center border-primary">
+            <div class="card-body">
+                <i class="bi bi-people fs-1 text-primary"></i>
+                <div class="stat-number text-primary" id="stat-total-members">--</div>
+                <small class="text-muted">Tổng hội viên</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card text-center border-success">
+            <div class="card-body">
+                <i class="bi bi-person-check fs-1 text-success"></i>
+                <div class="stat-number text-success" id="stat-active-members">--</div>
+                <small class="text-muted">Đang hoạt động</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card text-center border-warning">
+            <div class="card-body">
+                <i class="bi bi-cash-stack fs-1 text-warning"></i>
+                <div class="stat-number text-warning" id="stat-revenue">--</div>
+                <small class="text-muted">Doanh thu tháng</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card text-center border-info">
+            <div class="card-body">
+                <i class="bi bi-receipt fs-1 text-info"></i>
+                <div class="stat-number text-info" id="stat-unpaid">--</div>
+                <small class="text-muted">Hóa đơn chờ</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-grid"></i> Quản lý nhanh
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="/members/" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people"></i> Quản lý hội viên
+                </a>
+                <a href="/subscriptions/" class="list-group-item list-group-item-action">
+                    <i class="bi bi-card-checklist"></i> Đăng ký gói tập
+                </a>
+                <a href="/billing/" class="list-group-item list-group-item-action">
+                    <i class="bi bi-receipt"></i> Hóa đơn & Thanh toán
+                </a>
+                <a href="/reports/" class="list-group-item list-group-item-action">
+                    <i class="bi bi-bar-chart"></i> Báo cáo & Thống kê
+                </a>
+                <a href="/settings/" class="list-group-item list-group-item-action">
+                    <i class="bi bi-gear"></i> Cài đặt hệ thống
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clock-history"></i> Hoạt động gần đây
+            </div>
+            <div class="card-body text-muted">
+                <em>Dữ liệu sẽ hiển thị khi có hoạt động.</em>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif role == 'RECEPTIONIST' %}
+<!-- ══════════════ RECEPTIONIST DASHBOARD ══════════════ -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-person-plus"></i> Đăng ký hội viên
+            </div>
+            <div class="card-body">
+                <p>Đăng ký hội viên mới hoặc gia hạn gói tập cho hội viên hiện tại.</p>
+                <a href="/members/" class="btn btn-primary me-2">
+                    <i class="bi bi-people"></i> Danh sách hội viên
+                </a>
+                <a href="/subscriptions/" class="btn btn-outline-primary">
+                    <i class="bi bi-plus-circle"></i> Đăng ký mới
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-search"></i> Tra cứu hội viên
+            </div>
+            <div class="card-body">
+                <p>Tìm kiếm hội viên theo tên hoặc số điện thoại.</p>
+                <a href="/members/" class="btn btn-info text-white">
+                    <i class="bi bi-search"></i> Tra cứu
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif role == 'TRAINER' %}
+<!-- ══════════════ TRAINER DASHBOARD ══════════════ -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-calendar-week"></i> Lịch tập
+            </div>
+            <div class="card-body">
+                <p>Lập và quản lý kế hoạch tập luyện cho hội viên.</p>
+                <a href="/training/" class="btn btn-success">
+                    <i class="bi bi-list-task"></i> Quản lý lịch tập
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <i class="bi bi-people"></i> Hội viên của tôi
+            </div>
+            <div class="card-body">
+                <p>Xem danh sách hội viên đang được hướng dẫn.</p>
+                <a href="/training/" class="btn btn-secondary">
+                    <i class="bi bi-person-lines-fill"></i> Xem danh sách
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif role == 'CASHIER' %}
+<!-- ══════════════ CASHIER DASHBOARD ══════════════ -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <i class="bi bi-receipt"></i> Hóa đơn chờ thanh toán
+            </div>
+            <div class="card-body">
+                <p>Xác nhận thanh toán cho hội viên.</p>
+                <a href="/billing/" class="btn btn-warning">
+                    <i class="bi bi-cash-coin"></i> Quản lý thanh toán
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <i class="bi bi-clock-history"></i> Lịch sử thanh toán
+            </div>
+            <div class="card-body">
+                <p>Xem lịch sử tất cả hóa đơn đã thanh toán.</p>
+                <a href="/billing/" class="btn btn-secondary">
+                    <i class="bi bi-journal-text"></i> Xem lịch sử
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif role == 'MEMBER' %}
+<!-- ══════════════ MEMBER DASHBOARD ══════════════ -->
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-person-circle fs-1 text-primary"></i>
+                <h5 class="mt-2">{{ session.get('username', '') }}</h5>
+                <span class="badge bg-primary">Hội viên</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-calendar-week"></i> Lịch tập của tôi
+            </div>
+            <div class="card-body">
+                <a href="/training/my-plan" class="btn btn-success w-100">
+                    <i class="bi bi-eye"></i> Xem lịch tập
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-receipt"></i> Hóa đơn của tôi
+            </div>
+            <div class="card-body">
+                <a href="/billing/my-invoices" class="btn btn-info text-white w-100">
+                    <i class="bi bi-eye"></i> Xem hóa đơn
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle"></i>
+    Vai trò không xác định. Vui lòng liên hệ quản trị viên.
+</div>
+{% endif %}
 {% endblock %}

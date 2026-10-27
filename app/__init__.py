@@ -20,17 +20,24 @@ def create_app(config_name: str | None = None) -> Flask:
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
 
-    # ── Redis client ─────────────────────────────────────────────
+    # ── Redis client (graceful fallback if unavailable) ─────────
     import app.extensions as ext
-    ext.redis_client = redis_lib.Redis(
-        host=app.config['REDIS_HOST'],
-        port=app.config['REDIS_PORT'],
-        decode_responses=True,
-    )
-    app.config['SESSION_REDIS'] = redis_lib.Redis(
-        host=app.config['REDIS_HOST'],
-        port=app.config['REDIS_PORT'],
-    )
+    try:
+        ext.redis_client = redis_lib.Redis(
+            host=app.config['REDIS_HOST'],
+            port=app.config['REDIS_PORT'],
+            decode_responses=True,
+        )
+        ext.redis_client.ping()  # Test connection
+        app.config['SESSION_REDIS'] = redis_lib.Redis(
+            host=app.config['REDIS_HOST'],
+            port=app.config['REDIS_PORT'],
+        )
+    except (redis_lib.ConnectionError, redis_lib.TimeoutError):
+        # Fallback to filesystem session if Redis is not available
+        app.logger.warning('Redis not available – falling back to filesystem session.')
+        app.config['SESSION_TYPE'] = 'filesystem'
+        ext.redis_client = None
 
     # ── Extensions ───────────────────────────────────────────────
     db.init_app(app)
