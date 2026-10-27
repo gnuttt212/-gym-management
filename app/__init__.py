@@ -39,6 +39,9 @@ def create_app(config_name: str | None = None) -> Flask:
     sess.init_app(app)
     csrf.init_app(app)
 
+    # ── Models (import so Flask-Migrate detects them) ──────────
+    from . import models  # noqa: F401
+
     # ── Blueprints ───────────────────────────────────────────────
     from .auth.routes import auth_bp
     from .members.routes import members_bp
