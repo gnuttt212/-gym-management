@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Cài đặt hệ thống{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-gear"></i> Cài đặt hệ thống</h3>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }} alert-dismissible fade show">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="row">
+  <!-- Training Config -->
+  <div class="col-lg-5 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-sliders"></i> Quy định tập luyện</h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('settings.update_max_days') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label for="max_days" class="form-label">
+              Số ngày tập tối đa / tuần (BR3)
+            </label>
+            <div class="input-group" style="max-width: 200px;">
+              <input type="number" class="form-control" id="max_days" name="max_days"
+                     min="1" max="7" value="{{ max_days }}" required>
+              <span class="input-group-text">ngày</span>
+            </div>
+            <div class="form-text">Giá trị từ 1 đến 7. Ảnh hưởng đến tạo kế hoạch tập mới.</div>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg"></i> Cập nhật
+          </button>
+        </form>
+
+        <hr>
+
+        <h6 class="text-muted mb-3">Quản lý bài tập</h6>
+        <a href="{{ url_for('training.exercise_list') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-list-check"></i> Mở danh mục bài tập
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan Pricing -->
+  <div class="col-lg-7 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-tag"></i> Giá gói tập</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info mb-3">
+          <i class="bi bi-info-circle"></i>
+          <strong>BR2:</strong> Thay đổi giá chỉ ảnh hưởng hóa đơn <em>tương lai</em>.
+          Hóa đơn cũ giữ nguyên <code>price_snapshot</code>.
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Gói</th>
+                <th>Thời hạn</th>
+                <th>Giá hiện tại</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for plan in plans %}
+              <tr class="{{ 'table-secondary' if not plan.is_active }}">
+                <td><strong>{{ plan.name }}</strong></td>
+                <td>{{ plan.duration_months }} tháng</td>
+                <td>
+                  <form method="POST"
+                        action="{{ url_for('settings.update_plan_price', plan_id=plan.id) }}"
+                        class="d-flex gap-1" style="max-width: 220px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="text" class="form-control form-control-sm" name="price"
+                           value="{{ '{:,.0f}'.format(plan.price) }}"
+                           style="max-width: 140px;">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-check-lg"></i>
+                    </button>
+                  </form>
+                </td>
+                <td>
+                  {% if plan.is_active %}
+                    <span class="badge bg-success">Hoạt động</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Tắt</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <form method="POST"
+                        action="{{ url_for('settings.toggle_plan', plan_id=plan.id) }}"
+                        class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if plan.is_active %}
+                    <button type="submit" class="btn btn-sm btn-outline-warning"
+                            onclick="return confirm('Vô hiệu hóa gói này?');">
+                      <i class="bi bi-pause-circle"></i> Tắt
+                    </button>
+                    {% else %}
+                    <button type="submit" class="btn btn-sm btn-outline-success">
+                      <i class="bi bi-play-circle"></i> Bật
+                    </button>
+                    {% endif %}
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
