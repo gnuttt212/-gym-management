@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Quản lý bài tập{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3><i class="bi bi-list-check"></i> Danh mục bài tập</h3>
+  <div>
+    {% if show_inactive %}
+    <a href="{{ url_for('training.exercise_list') }}" class="btn btn-sm btn-outline-secondary">Chỉ hiện đang hoạt động</a>
+    {% else %}
+    <a href="{{ url_for('training.exercise_list', all=1) }}" class="btn btn-sm btn-outline-secondary">Hiện tất cả</a>
+    {% endif %}
+  </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }} alert-dismissible fade show">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+{% if session.get('role') == 'ADMIN' %}
+<!-- Add exercise form -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('training.exercise_add') }}" class="d-flex gap-2">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="text" class="form-control" name="name" placeholder="Tên bài tập mới..." required>
+      <button type="submit" class="btn btn-success text-nowrap">
+        <i class="bi bi-plus-circle"></i> Thêm
+      </button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+{% if exercises %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Tên bài tập</th>
+        <th>Trạng thái</th>
+        {% if session.get('role') == 'ADMIN' %}
+        <th>Thao tác</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for ex in exercises %}
+      <tr class="{{ 'table-secondary' if not ex.is_active }}">
+        <td>{{ loop.index }}</td>
+        <td>
+          {% if session.get('role') == 'ADMIN' and ex.is_active %}
+          <!-- Inline edit -->
+          <form method="POST" action="{{ url_for('training.exercise_edit', exercise_id=ex.id) }}"
+                class="d-flex gap-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="text" class="form-control form-control-sm" name="name"
+                   value="{{ ex.name }}" style="max-width: 300px;">
+            <button type="submit" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-check-lg"></i>
+            </button>
+          </form>
+          {% else %}
+            {{ ex.name }}
+          {% endif %}
+        </td>
+        <td>
+          {% if ex.is_active %}
+            <span class="badge bg-success">Hoạt động</span>
+          {% else %}
+            <span class="badge bg-secondary">Đã xóa</span>
+          {% endif %}
+        </td>
+        {% if session.get('role') == 'ADMIN' %}
+        <td>
+          {% if ex.is_active %}
+          <form method="POST" action="{{ url_for('training.exercise_delete', exercise_id=ex.id) }}"
+                class="d-inline" onsubmit="return confirm('Xóa mềm bài tập này?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-trash"></i> Xóa
+            </button>
+          </form>
+          {% else %}
+            <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="text-muted">Tổng: {{ exercises|length }} bài tập</p>
+{% else %}
+<div class="alert alert-info">Chưa có bài tập nào.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Kế hoạch tập #{{ plan.id }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    {% if session.get('role') == 'TRAINER' %}
+    <li class="breadcrumb-item"><a href="{{ url_for('training.trainer_plans') }}">Kế hoạch tập</a></li>
+    {% elif session.get('role') == 'MEMBER' %}
+    <li class="breadcrumb-item"><a href="{{ url_for('training.my_plans') }}">Lịch tập của tôi</a></li>
+    {% endif %}
+    <li class="breadcrumb-item active">Kế hoạch #{{ plan.id }}</li>
+  </ol>
+</nav>
+
+<div class="card shadow">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="bi bi-clipboard-data"></i> Kế hoạch tập #{{ plan.id }}</h5>
+    <span class="badge bg-light text-dark">
+      {{ plan.created_at.strftime('%d/%m/%Y %H:%M') if plan.created_at else '' }}
+    </span>
+  </div>
+  <div class="card-body">
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <p><strong>Hội viên:</strong> {{ plan.member.full_name if plan.member else '—' }}</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>HLV:</strong> {{ plan.trainer.full_name if plan.trainer else '—' }}</p>
+      </div>
+    </div>
+
+    {% if plan.items %}
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th>#</th>
+            <th>Bài tập</th>
+            <th>Số hiệp</th>
+            <th>Số lần/hiệp</th>
+            <th>Các ngày tập</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in plan.items %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <strong>{{ item.exercise.name if item.exercise else '—' }}</strong>
+              {% if item.exercise and not item.exercise.is_active %}
+                <span class="badge bg-secondary">Đã xóa</span>
+              {% endif %}
+            </td>
+            <td>{{ item.sets }}</td>
+            <td>{{ item.reps_per_set }}</td>
+            <td>
+              {% for d in item.weekday_list %}
+                <span class="badge bg-info text-dark">{{ weekday_name(d) }}</span>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Weekday summary -->
+    {% set all_days = [] %}
+    {% for item in plan.items %}
+      {% for d in item.weekday_list %}
+        {% if d not in all_days %}
+          {% if all_days.append(d) %}{% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+    <p class="text-muted">
+      <i class="bi bi-calendar3"></i>
+      Tổng ngày tập/tuần: <strong>{{ all_days|length }}</strong>
+      ({% for d in all_days|sort %}{{ weekday_name(d) }}{% if not loop.last %}, {% endif %}{% endfor %})
+    </p>
+    {% else %}
+    <div class="alert alert-info">Kế hoạch chưa có bài tập nào.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
