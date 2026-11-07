@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Gia hạn – {{ member.full_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('members.member_list') }}">Hội viên</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('members.member_detail', member_id=member.id) }}">{{ member.full_name }}</a></li>
+    <li class="breadcrumb-item active">Gia hạn</li>
+  </ol>
+</nav>
+
+<div class="row justify-content-center">
+  <div class="col-lg-5">
+    <div class="card shadow">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-arrow-repeat"></i> Gia hạn gói tập</h5>
+      </div>
+      <div class="card-body">
+        <p>Hội viên: <strong>{{ member.full_name }}</strong> ({{ member.phone }})</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="mb-4">
+            <label for="plan_id" class="form-label">Chọn gói tập mới</label>
+            <select class="form-select" id="plan_id" name="plan_id" required>
+              <option value="">-- Chọn gói --</option>
+              {% for plan in plans %}
+              <option value="{{ plan.id }}">
+                {{ plan.name }} – {{ '{:,.0f}'.format(plan.price) }}đ ({{ plan.duration_months }} tháng)
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-info btn-lg text-white">
+              <i class="bi bi-arrow-repeat"></i> Xác nhận gia hạn
+            </button>
+            <a href="{{ url_for('members.member_detail', member_id=member.id) }}" class="btn btn-secondary">Hủy</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
