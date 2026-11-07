@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Chi tiết hội viên – {{ member.full_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('members.member_list') }}">Hội viên</a></li>
+    <li class="breadcrumb-item active">{{ member.full_name }}</li>
+  </ol>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }} alert-dismissible fade show">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="row">
+  <!-- Member Info Card -->
+  <div class="col-lg-5 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-person-circle"></i> Thông tin hội viên</h5>
+        <a href="{{ url_for('members.member_edit', member_id=member.id) }}" class="btn btn-sm btn-light">
+          <i class="bi bi-pencil"></i> Sửa
+        </a>
+      </div>
+      <div class="card-body">
+        <table class="table table-borderless mb-0">
+          <tr><th style="width:40%">Họ tên</th><td>{{ member.full_name }}</td></tr>
+          <tr><th>SĐT</th><td>{{ member.phone }}</td></tr>
+          <tr><th>Email</th><td>{{ member.email or '—' }}</td></tr>
+          <tr>
+            <th>Giới tính</th>
+            <td>{% if member.gender == 'MALE' %}Nam{% elif member.gender == 'FEMALE' %}Nữ{% else %}Khác{% endif %}</td>
+          </tr>
+          <tr><th>Năm sinh</th><td>{{ member.birth_year }}</td></tr>
+          <tr><th>HLV cá nhân</th><td>{{ member.trainer.full_name if member.trainer else '— Chưa gán —' }}</td></tr>
+          <tr>
+            <th>Tài khoản</th>
+            <td>
+              {% if member.user_id %}
+                <span class="badge bg-info">Có (ID: {{ member.user_id }})</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Chưa có</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr><th>Ngày tạo</th><td>{{ member.created_at.strftime('%d/%m/%Y') if member.created_at else '—' }}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Status Card -->
+    <div class="card shadow mt-3">
+      <div class="card-body text-center">
+        {% if active_sub %}
+          <h5 class="text-success"><i class="bi bi-check-circle-fill"></i> Đang hoạt động</h5>
+          <p class="mb-1">Gói: <strong>{{ active_sub.plan.name }}</strong></p>
+          <p class="mb-1">Hết hạn: <strong>{{ active_sub.end_date.strftime('%d/%m/%Y') }}</strong></p>
+        {% else %}
+          <h5 class="text-secondary"><i class="bi bi-x-circle-fill"></i> Hết hạn</h5>
+          <p class="mb-0">Hội viên chưa có gói tập đang hoạt động.</p>
+        {% endif %}
+        <a href="{{ url_for('subscriptions.renew', member_id=member.id) }}" class="btn btn-outline-success mt-2">
+          <i class="bi bi-arrow-repeat"></i> Gia hạn / Đăng ký gói mới
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscription History -->
+  <div class="col-lg-7 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Lịch sử gói tập</h5>
+      </div>
+      <div class="card-body p-0">
+        {% if subscriptions %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Gói</th>
+                <th>Bắt đầu</th>
+                <th>Hết hạn</th>
+                <th>Trạng thái</th>
+                <th>Hóa đơn</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sub in subscriptions %}
+              <tr>
+                <td>{{ sub.plan.name }}</td>
+                <td>{{ sub.start_date.strftime('%d/%m/%Y') }}</td>
+                <td>{{ sub.end_date.strftime('%d/%m/%Y') }}</td>
+                <td>
+                  {% if sub.end_date >= today %}
+                    <span class="badge bg-success">Còn hạn</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Hết hạn</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if sub.invoice %}
+                    {% if sub.invoice.status == 'PAID' %}
+                      <span class="badge bg-success">Đã thanh toán</span>
+                    {% else %}
+                      <span class="badge bg-warning text-dark">Chưa thanh toán</span>
+                    {% endif %}
+                    <br><small>{{ '{:,.0f}'.format(sub.invoice.price_snapshot) }}đ</small>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <div class="p-3 text-muted">Chưa có lịch sử gói tập.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
