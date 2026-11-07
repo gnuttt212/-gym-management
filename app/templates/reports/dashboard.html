@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Báo cáo thống kê{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-graph-up"></i> Báo cáo thống kê</h3>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card text-white bg-primary shadow">
+      <div class="card-body text-center">
+        <h2>{{ summary.total_members }}</h2>
+        <p class="mb-0">Tổng hội viên</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-white bg-success shadow">
+      <div class="card-body text-center">
+        <h2>{{ summary.active_members }}</h2>
+        <p class="mb-0">Đang hoạt động</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-white bg-info shadow">
+      <div class="card-body text-center">
+        <h2>{{ '{:,.0f}'.format(summary.total_revenue) }}đ</h2>
+        <p class="mb-0">Tổng doanh thu</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-white bg-warning shadow">
+      <div class="card-body text-center">
+        <h2>{{ summary.unpaid_count }}</h2>
+        <p class="mb-0">Hóa đơn chưa thanh toán</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Year selector -->
+<div class="mb-4">
+  <label for="yearSelect" class="form-label fw-bold">Chọn năm:</label>
+  <select id="yearSelect" class="form-select" style="max-width: 150px; display: inline-block;">
+    {% for y in range(current_year - 2, current_year + 2) %}
+    <option value="{{ y }}" {{ 'selected' if y == current_year }}>{{ y }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<!-- Charts -->
+<div class="row">
+  <div class="col-lg-6 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-person-plus"></i> Hội viên đăng ký theo tháng</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="registrationChart" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-currency-dollar"></i> Doanh thu theo tháng (chỉ PAID)</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="revenueChart" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<script>
+let regChart = null;
+let revChart = null;
+
+function loadCharts(year) {
+  // Registration chart
+  fetch(`/reports/registrations.json?year=${year}`)
+    .then(r => r.json())
+    .then(data => {
+      if (regChart) regChart.destroy();
+      regChart = new Chart(document.getElementById('registrationChart'), {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Số hội viên đăng ký',
+            data: data.data,
+            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+    });
+
+  // Revenue chart
+  fetch(`/reports/revenue.json?year=${year}`)
+    .then(r => r.json())
+    .then(data => {
+      if (revChart) revChart.destroy();
+      revChart = new Chart(document.getElementById('revenueChart'), {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Doanh thu (VNĐ)',
+            data: data.data,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(v) {
+                  return new Intl.NumberFormat('vi-VN').format(v) + 'đ';
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+}
+
+// Load on page ready
+document.addEventListener('DOMContentLoaded', function() {
+  loadCharts({{ current_year }});
+});
+
+// Year selector change
+document.getElementById('yearSelect').addEventListener('change', function() {
+  loadCharts(this.value);
+});
+</script>
+{% endblock %}
