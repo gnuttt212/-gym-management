@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Hóa đơn của tôi{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-receipt-cutoff"></i> Hóa đơn của tôi</h3>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }} alert-dismissible fade show">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+{% if invoices %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Gói tập</th>
+        <th>Thời hạn</th>
+        <th>Số tiền</th>
+        <th>Trạng thái</th>
+        <th>Phương thức</th>
+        <th>Ngày thanh toán</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for inv in invoices %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>
+          {% if inv.subscription and inv.subscription.plan %}
+            {{ inv.subscription.plan.name }}
+          {% else %}—{% endif %}
+        </td>
+        <td>
+          {% if inv.subscription %}
+            {{ inv.subscription.start_date.strftime('%d/%m/%Y') }}
+            → {{ inv.subscription.end_date.strftime('%d/%m/%Y') }}
+          {% else %}—{% endif %}
+        </td>
+        <td><strong>{{ '{:,.0f}'.format(inv.price_snapshot) }}đ</strong></td>
+        <td>
+          {% if inv.status == 'PAID' %}
+            <span class="badge bg-success">Đã thanh toán</span>
+          {% else %}
+            <span class="badge bg-warning text-dark">Chưa thanh toán</span>
+          {% endif %}
+        </td>
+        <td>{{ inv.payment_method or '—' }}</td>
+        <td>{{ inv.paid_at.strftime('%d/%m/%Y %H:%M') if inv.paid_at else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info">Bạn chưa có hóa đơn nào.</div>
+{% endif %}
+{% endblock %}
