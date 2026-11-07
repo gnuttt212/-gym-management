@@ -1,20 +1,98 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block title %}Đăng ký hội viên{% endblock %}
 
 {% block content %}
-<div class="login-container">
+<div class="row justify-content-center">
+  <div class="col-lg-6">
     <div class="card shadow">
-        <div class="card-body p-4">
-            <h3 class="text-center mb-4">
-                <i class="bi bi-heart-pulse text-danger"></i> Đăng ký hội viên
-            </h3>
-            <p class="text-center text-muted">
-                Chức năng đăng ký trực tuyến sẽ được triển khai trong giai đoạn tiếp theo.
-            </p>
-            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary w-100">
-                <i class="bi bi-arrow-left"></i> Quay lại đăng nhập
-            </a>
-        </div>
+      <div class="card-header bg-success text-white">
+        <h4 class="mb-0"><i class="bi bi-person-plus"></i> Đăng ký hội viên trực tuyến</h4>
+      </div>
+      <div class="card-body">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="mb-3">
+            <label for="full_name" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="full_name" name="full_name"
+                   value="{{ request.form.get('full_name', '') }}" required>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="gender" class="form-label">Giới tính <span class="text-danger">*</span></label>
+              <select class="form-select" id="gender" name="gender" required>
+                <option value="">-- Chọn --</option>
+                <option value="MALE" {{ 'selected' if request.form.get('gender') == 'MALE' }}>Nam</option>
+                <option value="FEMALE" {{ 'selected' if request.form.get('gender') == 'FEMALE' }}>Nữ</option>
+                <option value="OTHER" {{ 'selected' if request.form.get('gender') == 'OTHER' }}>Khác</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="birth_year" class="form-label">Năm sinh <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="birth_year" name="birth_year"
+                     min="1940" max="2015" value="{{ request.form.get('birth_year', '') }}" required>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+              <input type="tel" class="form-control" id="phone" name="phone"
+                     placeholder="0912345678" value="{{ request.form.get('phone', '') }}" required>
+              <div class="form-text">SĐT cũng là tên đăng nhập của bạn.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email"
+                     value="{{ request.form.get('email', '') }}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="password" name="password"
+                   minlength="6" required>
+            <div class="form-text">Tối thiểu 6 ký tự.</div>
+          </div>
+
+          <div class="mb-4">
+            <label for="plan_id" class="form-label">Gói tập <span class="text-danger">*</span></label>
+            <select class="form-select" id="plan_id" name="plan_id" required>
+              <option value="">-- Chọn gói tập --</option>
+              {% for plan in plans %}
+              <option value="{{ plan.id }}" {{ 'selected' if request.form.get('plan_id')|string == plan.id|string }}>
+                {{ plan.name }} – {{ '{:,.0f}'.format(plan.price) }}đ
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="bi bi-check-circle"></i> Đăng ký
+            </button>
+          </div>
+        </form>
+
+        <hr>
+        <p class="text-center mb-0">
+          Đã có tài khoản? <a href="{{ url_for('auth.login') }}">Đăng nhập tại đây</a>
+        </p>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
