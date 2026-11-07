@@ -6,11 +6,11 @@
 
 Hệ thống quản lý phòng tập gym hỗ trợ 5 vai trò người dùng, bao gồm các chức năng:
 
-- **Quản trị viên (ADMIN):** Xem báo cáo thống kê (biểu đồ), quản lý cài đặt hệ thống (giá gói, danh mục bài tập, quy định).
-- **Lễ tân (RECEPTIONIST):** Lập danh sách hội viên, đăng ký gói tập tại quầy.
-- **Huấn luyện viên (TRAINER):** Lập lịch tập cá nhân cho hội viên.
-- **Thu ngân (CASHIER):** Quản lý hóa đơn, xác nhận thanh toán.
-- **Hội viên (MEMBER):** Đăng ký trực tuyến, xem lịch tập và hóa đơn cá nhân.
+- **Quản trị viên :** Xem báo cáo thống kê , quản lý cài đặt hệ thống.
+- **Lễ tân :** Lập danh sách hội viên, đăng ký gói tập tại quầy.
+- **Huấn luyện viên :** Lập lịch tập cá nhân cho hội viên.
+- **Thu ngân :** Quản lý hóa đơn, xác nhận thanh toán.
+- **Hội viên :** Đăng ký trực tuyến, xem lịch tập và hóa đơn cá nhân.
 
 ## Tính Năng Chính
 

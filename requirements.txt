@@ -4,11 +4,12 @@ Flask-Migrate==4.0.7
 Flask-Mail==0.10.0
 Flask-Session==0.8.0
 Flask-WTF==1.2.1
-SQLAlchemy==2.0.30
+SQLAlchemy>=2.0.36
 marshmallow==3.21.3
 redis==5.0.7
 PyMySQL==1.1.1
 cryptography==42.0.8
 python-dotenv==1.0.1
+python-dateutil==2.9.0
 Werkzeug==3.0.3
 gunicorn==22.0.0
