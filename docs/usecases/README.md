@@ -19,7 +19,6 @@ Các Use Case được tổ chức theo **6 module chức năng**, thay vì chia
 
 Khách tự đăng ký trực tuyến; lễ tân hỗ trợ đăng ký tại quầy. Cả hai hình thức đều gửi email xác nhận.
 
-[Mã Mermaid: `01-hoi-vien.mmd`](./01-hoi-vien.mmd)
 
 ```mermaid
 usecase-beta
@@ -45,7 +44,6 @@ Register ..> : include SendEmail
 
 Hội viên đăng ký hoặc gia hạn trực tuyến; lễ tân thực hiện tại quầy. Mỗi hình thức bao gồm thanh toán tương ứng.
 
-[Mã Mermaid: `02-goi-tap.mmd`](./02-goi-tap.mmd)
 
 ```mermaid
 usecase-beta
@@ -74,7 +72,6 @@ RenewDesk ..> : include PayDesk
 
 Thanh toán trực tuyến qua MoMo hoặc tại quầy qua thu ngân; thu ngân lập hóa đơn. Quyền xem lịch sử thanh toán phụ thuộc vai trò.
 
-[Mã Mermaid: `03-thanh-toan.mmd`](./03-thanh-toan.mmd)
 
 ```mermaid
 usecase-beta
@@ -101,7 +98,6 @@ PayDesk ..> : include Invoice
 
 Lễ tân gán huấn luyện viên; huấn luyện viên xem hội viên phụ trách và lập kế hoạch; hội viên xem lịch tập.
 
-[Mã Mermaid: `04-tap-luyen.mmd`](./04-tap-luyen.mmd)
 
 ```mermaid
 usecase-beta
@@ -125,7 +121,6 @@ Member -- ViewSchedule
 
 Quản trị viên tạo tài khoản nhân viên, quản lý bài tập, giá gói tập và giới hạn ngày tập.
 
-[Mã Mermaid: `05-quan-tri.mmd`](./05-quan-tri.mmd)
 
 ```mermaid
 usecase-beta
@@ -151,7 +146,6 @@ CreateStaff ..> : include SendEmail
 
 Quản trị viên theo dõi hội viên còn hạn, lượng hội viên đăng ký và doanh thu.
 
-[Mã Mermaid: `06-bao-cao.mmd`](./06-bao-cao.mmd)
 
 ```mermaid
 usecase-beta
